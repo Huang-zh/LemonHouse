@@ -1,5 +1,8 @@
 import com.xuxueli.crawler.annotation.PageFieldSelect;
 import com.xuxueli.crawler.annotation.PageSelect;
+import com.xuxueli.crawler.conf.XxlCrawlerConf;
+
+import java.util.List;
 
 /**
  * 爬虫示例01：爬取页面数据并封装VO对象
@@ -7,6 +10,28 @@ import com.xuxueli.crawler.annotation.PageSelect;
  * @author xuxueli 2017-10-09 19:48:48
  */
 public class XxlCrawlerTest {
+
+    @PageSelect(cssQuery = "body")
+    public static class PageImageVo {
+
+        @PageFieldSelect(cssQuery = "img", selectType = XxlCrawlerConf.SelectType.ATTR, selectVal = "abs:src")
+        private List<String> images;
+
+        public List<String> getImages() {
+            return images;
+        }
+
+        public void setImages(List<String> images) {
+            this.images = images;
+        }
+
+        @Override
+        public String toString() {
+            return "PageVo{" +
+                    "images=" + images +
+                    '}';
+        }
+    }
 
     @PageSelect(cssQuery = "#search-projects-ulist .project")
     public static class PageVo {

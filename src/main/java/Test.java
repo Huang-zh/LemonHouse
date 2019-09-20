@@ -18,9 +18,9 @@ public class Test {
                 .setWhiteUrlRegexs("https://gitee\\.com/xuxueli0323/projects\\?page=\\d+")
                 .setThreadCount(3)
                 .setAllowSpread(false)
-                .setPageParser(new PageParser<XxlCrawlerTest.PageVo>() {
+                .setPageParser(new PageParser<XxlCrawlerTest.PageImageVo>() {
                     @Override
-                    public void parse(Document html, Element pageVoElement, XxlCrawlerTest.PageVo pageVo) {
+                    public void parse(Document html, Element pageVoElement, XxlCrawlerTest.PageImageVo pageVo) {
                         // 解析封装 PageVo 对象
                         String pageUrl = html.baseUri();
                         System.out.println(pageUrl + "：" + pageVo.toString());
