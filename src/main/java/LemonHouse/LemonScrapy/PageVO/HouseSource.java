@@ -1,10 +1,9 @@
-package LemonScrapy.PageVO;
+package LemonHouse.LemonScrapy.PageVO;
 
 import com.xuxueli.crawler.annotation.PageFieldSelect;
 import com.xuxueli.crawler.annotation.PageSelect;
 import com.xuxueli.crawler.conf.XxlCrawlerConf;
 
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -120,7 +119,7 @@ public class HouseSource {
         @PageFieldSelect(cssQuery = "#introduction > div > div > div.transaction > div.content > ul > li:nth-child(3)")
         String lastTransactionTime;//上次交易时间
         @PageFieldSelect(cssQuery = "#introduction > div > div > div.transaction > div.content > ul > li:nth-child(4)")
-        String use;//用途
+        String mainUse;//用途
         @PageFieldSelect(cssQuery = "#introduction > div > div > div.transaction > div.content > ul > li:nth-child(5)")
         String houseYears;//房屋年限
         @PageFieldSelect(cssQuery = "#introduction > div > div > div.transaction > div.content > ul > li:nth-child(7)")
@@ -237,12 +236,12 @@ public class HouseSource {
             this.lastTransactionTime = lastTransactionTime;
         }
 
-        public String getUse() {
-            return use;
+        public String getMainUse() {
+            return mainUse;
         }
 
-        public void setUse(String use) {
-            this.use = use;
+        public void setMainUse(String mainUse) {
+            this.mainUse = mainUse;
         }
 
         public String getHouseYears() {
@@ -289,7 +288,7 @@ public class HouseSource {
                     ", listingTime='" + listingTime + '\'' +
                     ", authority='" + authority + '\'' +
                     ", lastTransactionTime='" + lastTransactionTime + '\'' +
-                    ", use='" + use + '\'' +
+                    ", use='" + mainUse + '\'' +
                     ", houseYears='" + houseYears + '\'' +
                     ", mortgage='" + mortgage + '\'' +
                     '}';
@@ -315,6 +314,33 @@ public class HouseSource {
             return "image{" +
                     "imageSrc='" + imageSrc + '\'' +
                     '}';
+        }
+    }
+
+    @PageSelect(cssQuery = "body > div.overview > div.content > div.aroundInfo > div.areaName")
+    public static class around{
+
+        @PageFieldSelect(cssQuery = "span.info")
+        private String belong;//所属区和街道
+
+        @PageFieldSelect(cssQuery = "a.supplement",selectType = XxlCrawlerConf.SelectType.ATTR,
+                selectVal = "title")
+        private String subway;//地铁信息
+
+        public String getBelong() {
+            return belong;
+        }
+
+        public void setBelong(String belong) {
+            this.belong = belong;
+        }
+
+        public String getSubway() {
+            return subway;
+        }
+
+        public void setSubway(String subway) {
+            this.subway = subway;
         }
     }
 }

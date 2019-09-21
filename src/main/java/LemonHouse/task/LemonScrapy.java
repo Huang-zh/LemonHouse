@@ -1,36 +1,51 @@
-package LemonScrapy;
+package LemonHouse.task;
 
-import LemonScrapy.PageVO.HouseSource;
+import LemonHouse.LemonScrapy.PageVO.HouseSource;
+import LemonHouse.service.HouseDetailService;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.xuxueli.crawler.XxlCrawler;
 import com.xuxueli.crawler.parser.PageParser;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @Auther: huang.zh
  * @Date: 2019/9/19 13:23
- * @Description:爬虫
+ * @Description:爬虫任务
  */
-
+@Component
+@Configuration
+@EnableScheduling
 public class LemonScrapy {
-
+    @Autowired
+    private HouseDetailService houseDetailService;
     private static final String prefix = "https://hz.lianjia.com/ershoufang/";
-
-    public static void main(String[] args) {
+    @Scheduled(cron = "* 50 17 * * ?")
+    public void excute() {
+        List<JSONObject> list = new ArrayList<>();
         PageParser<HouseSource.SamPleHouse> pageParser = new PageParser<HouseSource.SamPleHouse>() {
             @Override
             public void parse(Document html, Element pageVoElement, HouseSource.SamPleHouse pageVo) {
                 // 解析封装 PageVo 对象
-                String pageUrl = html.baseUri();
-//                System.out.println(Thread.currentThread().getName()+" "+pageUrl + "：" + pageVo.toString());
-                getHouseDetail(pageVo.getHouseCode());
-                getHouseImage(pageVo.getHouseCode());
-                System.out.println();
+                JSONObject object = JSON.parseObject(JSON.toJSONString(pageVo));
+                object = getHouseDetail(pageVo.getHouseCode(),object);
+                list.add(object);
             }
         };
         XxlCrawler crawler  = getCrawler(10,3000,false,pageParser,
                 "https://hz.lianjia.com/ershoufang/pg1");
         crawler.start(true);
+        if (!list.isEmpty())
+           houseDetailService.saveSample(list);
     }
 
     /**
@@ -40,18 +55,21 @@ public class LemonScrapy {
      * @Date: 2019/9/20 9:43
      * @params:[houseCode:房源编码]
      */
-    static void getHouseDetail(String houseCode){
+    static JSONObject getHouseDetail(String houseCode,JSONObject object){
         String url = prefix+houseCode+".html";
+        JSONObject result;
         PageParser<HouseSource.House> pageParser = new PageParser<HouseSource.House>() {
             @Override
             public void parse(Document html, Element pageVoElement, HouseSource.House pageVo) {
                 // 解析封装 PageVo 对象
-                String pageUrl = html.baseUri();
-//                System.out.println(Thread.currentThread().getName()+" "+pageUrl + "：" + pageVo.toString());
+                JSONObject detail = JSON.parseObject(JSON.toJSONString(pageVo));
+                object.put("detail",detail);
+                getHouseImage(houseCode,object);
             }
         };
         XxlCrawler crawler  = getCrawler(false,pageParser, url);
         crawler.start(true);
+        return object;
     }
     /**
      * @description:获取房源图片
@@ -60,18 +78,43 @@ public class LemonScrapy {
      * @Date: 2019/9/20 11:11
      * @params:[houseCode:房源编码]
      */
-    static void getHouseImage(String houseCode){
+    static JSONObject getHouseImage(String houseCode,JSONObject object){
         String url = prefix+houseCode+".html";
         PageParser<HouseSource.image> pageParser = new PageParser<HouseSource.image>() {
             @Override
             public void parse(Document html, Element pageVoElement, HouseSource.image pageVo) {
                 // 解析封装 PageVo 对象
                 String pageUrl = html.baseUri();
-//                System.out.println(Thread.currentThread().getName()+" "+pageUrl + "：" + pageVo.toString());
+                System.out.println(Thread.currentThread().getName()+" "+pageUrl + "：" + pageVo.toString());
+                object.getJSONObject("detail").put("imageSrc",pageVo.getImageSrc());
+                getHouseAroundMessage(houseCode,object);
             }
         };
         XxlCrawler crawler  = getCrawler(false,pageParser, url);
         crawler.start(true);
+        return object;
+    }
+
+    /**
+     *  @author: huang.zh
+     *  @Date: 2019/9/21 0021 17:31
+     *  @Description:获取房源所属模块和地铁信息
+     */
+    static JSONObject getHouseAroundMessage(String houseCode,JSONObject object){
+        String url = prefix+houseCode+".html";
+        PageParser<HouseSource.around> pageParser = new PageParser<HouseSource.around>() {
+            @Override
+            public void parse(Document html, Element pageVoElement, HouseSource.around pageVo) {
+                // 解析封装 PageVo 对象
+                String pageUrl = html.baseUri();
+                System.out.println(Thread.currentThread().getName()+" "+pageUrl + "：" + pageVo.toString());
+                object.getJSONObject("detail").put("belong",pageVo.getBelong());
+                object.getJSONObject("detail").put("subway",pageVo.getSubway());
+            }
+        };
+        XxlCrawler crawler  = getCrawler(false,pageParser, url);
+        crawler.start(true);
+        return object;
     }
 
     public static XxlCrawler getCrawler(PageParser parser,String... url){
