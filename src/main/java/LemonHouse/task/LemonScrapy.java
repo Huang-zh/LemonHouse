@@ -29,7 +29,7 @@ public class LemonScrapy {
     @Autowired
     private HouseDetailService houseDetailService;
     private static final String prefix = "https://hz.lianjia.com/ershoufang/";
-    @Scheduled(cron = "* 50 17 * * ?")
+    @Scheduled(cron = "* 02 21 * * ?")
     public void excute() {
         List<JSONObject> list = new ArrayList<>();
         PageParser<HouseSource.SamPleHouse> pageParser = new PageParser<HouseSource.SamPleHouse>() {
@@ -41,9 +41,13 @@ public class LemonScrapy {
                 list.add(object);
             }
         };
-        XxlCrawler crawler  = getCrawler(10,3000,false,pageParser,
-                "https://hz.lianjia.com/ershoufang/pg1");
-        crawler.start(true);
+        int i = 1;
+        while (i<=100){
+            XxlCrawler crawler  = getCrawler(10,3000,false,pageParser,
+                    "https://hz.lianjia.com/ershoufang/pg"+i);
+            crawler.start(true);
+            i++;
+        }
         if (!list.isEmpty())
            houseDetailService.saveSample(list);
     }
