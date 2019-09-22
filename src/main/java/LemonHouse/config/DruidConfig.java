@@ -15,6 +15,12 @@ import org.springframework.context.annotation.Primary;
 import javax.sql.DataSource;
 import java.sql.SQLException;
 
+
+/**
+ *  @author: huang.zh
+ *  @Date: 2019/9/22 0022 12:31
+ *  @Description:druid连接池配置
+ */
 @Configuration
 public class DruidConfig {
 

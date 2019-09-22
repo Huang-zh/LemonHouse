@@ -1,6 +1,12 @@
 package LemonHouse.dao;
 
+import LemonHouse.Entity.HouseDetail;
+import LemonHouse.Mapper.HouseDetailMapper;
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -15,6 +21,9 @@ import java.util.List;
 @Repository("houseDetailDao")
 public class HouseDetailDao extends BaseDao{
 
+    @Autowired
+    private HouseDetailMapper houseDetailMapper;
+
     public void batchSaveOrUpdate(List<Object[]> list,String sql){
         jdbcTemplate.batchUpdate(sql,list);
     }
@@ -22,6 +31,10 @@ public class HouseDetailDao extends BaseDao{
     public JSONObject findByHouseCode(String houseCode){
         String sql = "select * from housedetail where houseCode = '"+houseCode+"'";
         return jdbcTemplate.queryForObject(sql,JSON_ROW_MAPPER);
+    }
+
+    public IPage<HouseDetail> getList(Page page, QueryWrapper<HouseDetail> wrapper){
+        return houseDetailMapper.selectPage(page, wrapper);
     }
 
 

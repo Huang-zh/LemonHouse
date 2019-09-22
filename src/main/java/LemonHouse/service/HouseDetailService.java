@@ -1,10 +1,13 @@
 package LemonHouse.service;
 
 
-import LemonHouse.LemonScrapy.PageVO.HouseSource;
+import LemonHouse.Entity.HouseDetail;
 import LemonHouse.dao.HouseDetailDao;
 import LemonHouse.utils.LemonUtil;
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -65,4 +68,17 @@ public class HouseDetailService {
         }
         houseDetailDao.batchSaveOrUpdate(params,sql);
     }
+
+    public IPage<HouseDetail> getList(Page page, HouseDetail house){
+        QueryWrapper<HouseDetail> wrapper = new QueryWrapper<>();
+        if (LemonUtil.isNotBlank(house.getHouseCode()))
+            wrapper.eq("houseCode",house.getHouseCode());
+        if (LemonUtil.isNotBlank(house.getBelong()))
+            wrapper.like("belong",house.getBelong());
+        if (LemonUtil.isNotBlank(house.getSubway()))
+            wrapper.isNotNull("subway");
+        return houseDetailDao.getList(page,wrapper);
+    }
+
+
 }

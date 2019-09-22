@@ -1,4 +1,4 @@
-package LemonHouse.controler;
+package LemonHouse.controller;
 
 import org.springframework.web.servlet.ModelAndView;
 
