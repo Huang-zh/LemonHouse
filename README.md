@@ -12,4 +12,4 @@
 
 ## 更新日志
 * 2019-09-21 完善爬虫，修改表结构
-* 2019-09-22 提供业务查询接口，使用mybatis-plus和jdbcTemplate混合开发，暂定去除spring-data-jpa
+* 2019-09-22 提供业务查询接口，使用mybatis-plus和jdbcTemplate混合开发，暂定去除spring-data-jpa，采用lombok简化开发流程
